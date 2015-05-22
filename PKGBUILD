@@ -121,7 +121,7 @@ install_tls() {
             ;;
         *)
             echo "Unrecognized TLS library type $5"
-            return 1
+            exit 1
             ;;
     esac
 }
