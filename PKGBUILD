@@ -5,7 +5,7 @@
 # Contributor: Aaron Plattner <aplattner@nvidia.com>
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'nvidia-libgl' 'opencl-nvidia')
-pkgver=352.09
+pkgver=355.06
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -13,8 +13,8 @@ license=('custom')
 options=('!strip')
 source=("ftp://download.nvidia.com/XFree86/Linux-x86/${pkgver}/NVIDIA-Linux-x86-${pkgver}.run"
         "ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-sha1sums=('1cc711e6c419ee03b0656cb4004aeb2e3effb4bd'
-          '3ab419b8ec442b6f59ff17d7aa53f72f66021810')
+sha1sums=('35776639862ea1c5ac4e2be8baf92abaedf87cac'
+          '2b9f490e082d2b56b2f48b07b5ebca5fda26cfb4')
 
 [[ "$CARCH" = "i686" ]] && _pkg="NVIDIA-Linux-x86-${pkgver}"
 [[ "$CARCH" = "x86_64" ]] && _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
@@ -44,7 +44,6 @@ process_manifest () {
         ["VDPAU_LIB"]="nvidia-libgl install_lib"
         ["VDPAU_SYMLINK"]="nvidia-libgl symlink_lib_with_path"
         ["XMODULE_SHARED_LIB"]="nvidia-libgl install_x_driver"
-        ["XORG_OUTPUTCLASS_CONFIG"]="nvidia-libgl install_x_config"
 
         # nvidia-utils
         ["CUDA_LIB"]="nvidia-utils install_lib"
@@ -65,11 +64,13 @@ process_manifest () {
         # Ignored entries
         ["INSTALLER_BINARY"]="ignored"          # provided by pacman :)
         ["KERNEL_MODULE_SRC"]="ignored"         # kernel modules are handled by the nvidia PKGBUILD
+        ["DKMS_CONF"]="ignored"                 # dkms is not used
         ["LIBGL_LA"]="ignored"                  # .la files are not needed
         ["OPENCL_WRAPPER_LIB"]="ignored"        # provided by libcl
         ["OPENCL_WRAPPER_SYMLINK"]="ignored"    # provided by libcl
         ["OPENGL_HEADER"]="ignored"             # provided by mesa
         ["UTILITY_BIN_SYMLINK"]="ignored"       # provided by pacman
+        ["XORG_OUTPUTCLASS_CONFIG"]="ignored"   # provided by xorg-server
         ["UVM_MODULE_SRC"]="ignored"            # kernel modules are handled by the nvidia PKGBUILD
         ["VDPAU_WRAPPER_LIB"]="ignored"         # provided by libvdpau
         ["VDPAU_WRAPPER_SYMLINK"]="ignored"     # provided by libvdpau
@@ -107,7 +108,6 @@ install_glx_module()    { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/e
 install_lib()           { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
 install_man()           { install -D -m$2 "$1" "${pkgdir}/usr/share/man/man1/$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
-install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
 install_x_driver()      { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/drivers/$1"; }
 
 install_tls() {
