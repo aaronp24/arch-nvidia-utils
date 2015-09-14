@@ -5,7 +5,7 @@
 # Contributor: Aaron Plattner <aplattner@nvidia.com>
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'nvidia-libgl' 'opencl-nvidia')
-pkgver=355.06
+pkgver=355.11
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -13,8 +13,8 @@ license=('custom')
 options=('!strip')
 source=("ftp://download.nvidia.com/XFree86/Linux-x86/${pkgver}/NVIDIA-Linux-x86-${pkgver}.run"
         "ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-sha1sums=('35776639862ea1c5ac4e2be8baf92abaedf87cac'
-          '2b9f490e082d2b56b2f48b07b5ebca5fda26cfb4')
+sha1sums=('5e944003366c2ec701ba5e0faf897cc1fd0defbf'
+          'e21f03e2f641e8b36ac6f2df0f632b1ce5b83d63')
 
 [[ "$CARCH" = "i686" ]] && _pkg="NVIDIA-Linux-x86-${pkgver}"
 [[ "$CARCH" = "x86_64" ]] && _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
@@ -70,7 +70,7 @@ process_manifest () {
         ["OPENCL_WRAPPER_SYMLINK"]="ignored"    # provided by libcl
         ["OPENGL_HEADER"]="ignored"             # provided by mesa
         ["UTILITY_BIN_SYMLINK"]="ignored"       # provided by pacman
-        ["XORG_OUTPUTCLASS_CONFIG"]="ignored"   # provided by xorg-server
+        ["XORG_OUTPUTCLASS_CONFIG"]="ignored"   # provided by xorg-server FS#45973
         ["UVM_MODULE_SRC"]="ignored"            # kernel modules are handled by the nvidia PKGBUILD
         ["VDPAU_WRAPPER_LIB"]="ignored"         # provided by libvdpau
         ["VDPAU_WRAPPER_SYMLINK"]="ignored"     # provided by libvdpau
