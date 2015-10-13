@@ -119,6 +119,7 @@ install_tls() {
             ;;
         NEW)
             install -D -m$2 "$1" "${pkgdir}/usr/lib/$1"
+            ln -s "$1" "${pkgdir}/usr/lib/libnvidia-tls.so.${pkgver}"
             ;;
         *)
             echo "Unrecognized TLS library type $5"
