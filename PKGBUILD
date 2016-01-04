@@ -104,13 +104,21 @@ process_manifest () {
 
 install_app_profile()   { install -D -m$2 "$1" "${pkgdir}/usr/share/nvidia/$1"; }
 install_bin()           { install -D -m$2 "$1" "${pkgdir}/usr/bin/$1"; }
-install_dot_desktop()   { install -D -m$2 "$1" "${pkgdir}/usr/share/applications/$1"; }
 install_glx_module()    { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/extensions/$1"; }
 install_lib()           { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
 install_man()           { install -D -m$2 "$1" "${pkgdir}/usr/share/man/man1/$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
 install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
 install_x_driver()      { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/drivers/$1"; }
+
+install_dot_desktop()   {
+    install -D -m$2 "$1" "${pkgdir}/usr/share/applications/$1"
+
+    # Set the appropriate paths in the .desktop file
+    sed -i -e s:__UTILS_PATH__:/usr/bin: \
+           -e s:__PIXMAP_PATH__:/usr/share/doc/nvidia: \
+           "${pkgdir}/usr/share/applications/$1"
+}
 
 install_tls() {
     # Only "new" TLS is needed on modern systems.
