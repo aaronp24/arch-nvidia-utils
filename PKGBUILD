@@ -6,7 +6,7 @@
 
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'nvidia-libgl' 'opencl-nvidia')
-pkgver=358.16
+pkgver=361.16
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -14,8 +14,8 @@ license=('custom')
 options=('!strip')
 source=("ftp://download.nvidia.com/XFree86/Linux-x86/${pkgver}/NVIDIA-Linux-x86-${pkgver}.run"
         "ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-sha1sums=('2018e6b2729990ef380eee2b4e0154d6f3988ca6'
-          'cda6955c399c4016b747146d6b604c1a7e48a86d')
+sha1sums=('786d94caab0830fd16039cc7d26e1e6d6694d766'
+          'b778a97a5175ac6999461708610e55cf445fdf4d')
 
 [[ "$CARCH" = "i686" ]] && _pkg="NVIDIA-Linux-x86-${pkgver}"
 [[ "$CARCH" = "x86_64" ]] && _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
@@ -41,6 +41,8 @@ process_manifest () {
         ["NVIDIA_MODPROBE"]="nvidia-libgl install_bin"
         ["OPENGL_LIB"]="nvidia-libgl install_lib"
         ["OPENGL_SYMLINK"]="nvidia-libgl symlink_lib"
+        ["GLVND_LIB"]="nvidia-libgl install_lib"
+        ["GLVND_SYMLINK"]="nvidia-libgl symlink_lib"
         ["TLS_LIB"]="nvidia-libgl install_tls"
         ["VDPAU_LIB"]="nvidia-libgl install_lib"
         ["VDPAU_SYMLINK"]="nvidia-libgl symlink_lib_with_path"
@@ -73,8 +75,6 @@ process_manifest () {
         ["OPENGL_HEADER"]="ignored"             # provided by mesa
         ["UTILITY_BIN_SYMLINK"]="ignored"       # provided by pacman
         ["UVM_MODULE_SRC"]="ignored"            # kernel modules are handled by the nvidia PKGBUILD
-        ["VDPAU_WRAPPER_LIB"]="ignored"         # provided by libvdpau
-        ["VDPAU_WRAPPER_SYMLINK"]="ignored"     # provided by libvdpau
         ["XMODULE_NEWSYM"]="ignored"            # not needed for modern X servers
         ["XMODULE_SYMLINK"]="ignored"           # not needed for modern X servers
     )
