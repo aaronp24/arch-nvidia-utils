@@ -109,7 +109,17 @@ install_lib()           { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
 install_man()           { install -D -m$2 "$1" "${pkgdir}/usr/share/man/man1/$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
 install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
-install_x_driver()      { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/drivers/$1"; }
+
+install_x_driver()      {
+    case "$1" in
+        libnvidia-wfb*)
+            # not needed for modern X servers
+            ;;
+        *)
+            install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/$4$1";
+            ;;
+    esac
+}
 
 install_dot_desktop()   {
     install -D -m$2 "$1" "${pkgdir}/usr/share/applications/$1"
