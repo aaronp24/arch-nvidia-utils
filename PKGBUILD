@@ -12,8 +12,8 @@ arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
-source=("ftp://download.nvidia.com/XFree86/Linux-x86/${pkgver}/NVIDIA-Linux-x86-${pkgver}.run"
-        "ftp://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
+source=("http://us.download.nvidia.com/XFree86/Linux-x86/${pkgver}/NVIDIA-Linux-x86-${pkgver}.run"
+        "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
 sha1sums=('786d94caab0830fd16039cc7d26e1e6d6694d766'
           'b778a97a5175ac6999461708610e55cf445fdf4d')
 
@@ -35,14 +35,14 @@ process_manifest () {
 
         # nvidia-libgl
         ["APPLICATION_PROFILE"]="nvidia-libgl install_app_profile"
+        ["GLVND_LIB"]="nvidia-libgl install_lib"
+        ["GLVND_SYMLINK"]="nvidia-libgl symlink_lib"
         ["GLX_MODULE_SHARED_LIB"]="nvidia-libgl install_glx_module"
         ["GLX_MODULE_SYMLINK"]="nvidia-libgl symlink_glx_module"
         ["NVIDIA_MODPROBE_MANPAGE"]="nvidia-libgl install_man"
         ["NVIDIA_MODPROBE"]="nvidia-libgl install_bin"
         ["OPENGL_LIB"]="nvidia-libgl install_lib"
         ["OPENGL_SYMLINK"]="nvidia-libgl symlink_lib"
-        ["GLVND_LIB"]="nvidia-libgl install_lib"
-        ["GLVND_SYMLINK"]="nvidia-libgl symlink_lib"
         ["TLS_LIB"]="nvidia-libgl install_tls"
         ["VDPAU_LIB"]="nvidia-libgl install_lib"
         ["VDPAU_SYMLINK"]="nvidia-libgl symlink_lib_with_path"
@@ -109,7 +109,17 @@ install_lib()           { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
 install_man()           { install -D -m$2 "$1" "${pkgdir}/usr/share/man/man1/$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
 install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
-install_x_driver()      { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/drivers/$1"; }
+
+install_x_driver()      {
+    case "$1" in
+        libnvidia-wfb*)
+            # not needed for modern X servers
+            ;;
+        *)
+            install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/$4$1";
+            ;;
+    esac
+}
 
 install_dot_desktop()   {
     install -D -m$2 "$1" "${pkgdir}/usr/share/applications/$1"
