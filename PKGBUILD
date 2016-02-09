@@ -6,16 +6,16 @@
 
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'nvidia-libgl' 'opencl-nvidia')
-pkgver=361.18
+pkgver=361.28
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
 source=("http://us.download.nvidia.com/XFree86/Linux-x86/${pkgver}/NVIDIA-Linux-x86-${pkgver}.run"
-        "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-sha1sums=('695a0a04135a7d9f56e31ee2b85c39184c531e8a'
-          '2376905c5df86fe1c99dbb31f3ae9651624cdf95')
+        "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat3
+sha1sums=('aa7057262cf34d53c87e2caf231301d5a499b13b'
+          '7603e8accef2fddb9d87fd1ab15511fd62f6547d')
 
 [[ "$CARCH" = "i686" ]] && _pkg="NVIDIA-Linux-x86-${pkgver}"
 [[ "$CARCH" = "x86_64" ]] && _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
@@ -37,6 +37,8 @@ process_manifest () {
         ["APPLICATION_PROFILE"]="nvidia-libgl install_app_profile"
         ["GLVND_LIB"]="nvidia-libgl install_lib"
         ["GLVND_SYMLINK"]="nvidia-libgl symlink_lib"
+        ["GLX_CLIENT_LIB"]="nvidia-libgl install_glvnd"
+        ["GLX_CLIENT_SYMLINK"]="nvidia-libgl symlink_glvnd"
         ["GLX_MODULE_SHARED_LIB"]="nvidia-libgl install_glx_module"
         ["GLX_MODULE_SYMLINK"]="nvidia-libgl symlink_glx_module"
         ["NVIDIA_MODPROBE_MANPAGE"]="nvidia-libgl install_man"
@@ -109,6 +111,17 @@ install_man()           { install -D -m$2 "$1" "${pkgdir}/usr/share/man/man1/$1"
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
 install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
 
+install_glvnd()      {
+    case "$5" in
+        NON_GLVND)
+            # legacy non-GLVND GLX libraries
+            ;;
+        GLVND)
+            install -D -m$2 "$1" "${pkgdir}/usr/lib/$1";
+            ;;
+    esac
+}
+
 install_x_driver()      {
     case "$1" in
         libnvidia-wfb*)
@@ -156,6 +169,17 @@ install_doc() {
 symlink_glx_module()    { ln -s "$5" "${pkgdir}/usr/lib/xorg/modules/extensions/$1"; }
 symlink_lib()           { ln -s "$5" "${pkgdir}/usr/lib/$1"; }
 symlink_lib_with_path() { ln -s "$6" "${pkgdir}/usr/lib/$5$1"; }
+
+symlink_glvnd()      {
+    case "$6" in
+        NON_GLVND)
+            # legacy non-GLVND GLX symlinks
+            ;;
+        GLVND)
+            ln -s "$5" "${pkgdir}/usr/lib/$1";
+            ;;
+    esac
+}
 
 package_opencl-nvidia() {
     pkgdesc="OpenCL implemention for NVIDIA"
