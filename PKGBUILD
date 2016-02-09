@@ -13,7 +13,7 @@ url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
 source=("http://us.download.nvidia.com/XFree86/Linux-x86/${pkgver}/NVIDIA-Linux-x86-${pkgver}.run"
-        "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat3
+        "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
 sha1sums=('aa7057262cf34d53c87e2caf231301d5a499b13b'
           '7603e8accef2fddb9d87fd1ab15511fd62f6547d')
 
