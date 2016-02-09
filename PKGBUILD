@@ -139,8 +139,7 @@ install_tls() {
             return
             ;;
         NEW)
-            local libname=$(basename $1)
-            install -D -m$2 "$1" "${pkgdir}/usr/lib/${libname}"
+            install -D -m$2 "$1" "${pkgdir}/usr/lib/$1"
             ;;
         *)
             echo "Unrecognized TLS library type $5"
