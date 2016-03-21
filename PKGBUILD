@@ -6,7 +6,7 @@
 
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'nvidia-libgl' 'opencl-nvidia')
-pkgver=361.28
+pkgver=364.12
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -14,8 +14,8 @@ license=('custom')
 options=('!strip')
 source=("http://us.download.nvidia.com/XFree86/Linux-x86/${pkgver}/NVIDIA-Linux-x86-${pkgver}.run"
         "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-sha1sums=('aa7057262cf34d53c87e2caf231301d5a499b13b'
-          '7603e8accef2fddb9d87fd1ab15511fd62f6547d')
+sha1sums=('ab81a2d75fb2e6902424bd35baa06d4d564d54de'
+          '34f82daabdce59fde5d28eab258be36d14c933ba')
 
 [[ "$CARCH" = "i686" ]] && _pkg="NVIDIA-Linux-x86-${pkgver}"
 [[ "$CARCH" = "x86_64" ]] && _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
@@ -48,6 +48,7 @@ process_manifest () {
         ["TLS_LIB"]="nvidia-libgl install_tls"
         ["VDPAU_LIB"]="nvidia-libgl install_lib"
         ["VDPAU_SYMLINK"]="nvidia-libgl symlink_lib_with_path"
+        ["VULKAN_ICD_JSON"]="nvidia-libgl install_vulkan_icd"
         ["XMODULE_SHARED_LIB"]="nvidia-libgl install_x_driver"
         ["XORG_OUTPUTCLASS_CONFIG"]="nvidia-libgl install_x_config"
 
@@ -109,9 +110,10 @@ install_glx_module()    { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/e
 install_lib()           { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
 install_man()           { install -D -m$2 "$1" "${pkgdir}/usr/share/man/man1/$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
+install_vulkan_icd()    { install -D -m$2 "$1" "${pkgdir}/etc/vulkan/icd.d/$1"; }
 install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
 
-install_glvnd()      {
+install_glvnd()         {
     case "$5" in
         NON_GLVND)
             # legacy non-GLVND GLX libraries
@@ -192,9 +194,9 @@ package_opencl-nvidia() {
 
 package_nvidia-libgl() {
     pkgdesc="NVIDIA drivers libraries"
-    conflicts=('libgl')
-    provides=('libgl')
     optdepends=('libvdpau: VDPAU wrapper library')
+    provides=('libgl' 'libglvnd')
+    conflicts=('libgl' 'libglvnd')
     cd "${_pkg}"
 
     process_manifest
@@ -203,9 +205,9 @@ package_nvidia-libgl() {
 package_nvidia-utils() {
     pkgdesc="NVIDIA drivers utilities"
     depends=('xorg-server')
-    optdepends=('gtk3: nvidia-settings'
-                'xorg-server-devel: nvidia-xconfig'
+    optdepends=('xorg-server-devel: nvidia-xconfig'
                 'opencl-nvidia: OpenCL support')
+    provides=('nvidia-settings')
     install="${pkgname}.install"
     cd "${_pkg}"
 
