@@ -172,7 +172,7 @@ symlink_glx_module()    { ln -s "$5" "${pkgdir}/usr/lib/xorg/modules/extensions/
 symlink_lib()           { ln -s "$5" "${pkgdir}/usr/lib/$1"; }
 symlink_lib_with_path() { ln -s "$6" "${pkgdir}/usr/lib/$5$1"; }
 
-symlink_glvnd()      {
+symlink_glvnd()         {
     case "$6" in
         NON_GLVND)
             # legacy non-GLVND GLX symlinks
@@ -208,6 +208,7 @@ package_nvidia-utils() {
     optdepends=('xorg-server-devel: nvidia-xconfig'
                 'opencl-nvidia: OpenCL support')
     provides=('nvidia-settings')
+    conflicts=('nvidia-settings')
     install="${pkgname}.install"
     cd "${_pkg}"
 
