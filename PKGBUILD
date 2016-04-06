@@ -6,7 +6,7 @@
 
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'nvidia-libgl' 'opencl-nvidia')
-pkgver=364.12
+pkgver=364.15
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -14,8 +14,8 @@ license=('custom')
 options=('!strip')
 source=("http://us.download.nvidia.com/XFree86/Linux-x86/${pkgver}/NVIDIA-Linux-x86-${pkgver}.run"
         "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-sha1sums=('ab81a2d75fb2e6902424bd35baa06d4d564d54de'
-          '34f82daabdce59fde5d28eab258be36d14c933ba')
+sha1sums=('901d42100e262fd46cb22f68d98c69868ff4423c'
+          'aeaf120198194e4110b92be5e566a0ae779e792c')
 
 [[ "$CARCH" = "i686" ]] && _pkg="NVIDIA-Linux-x86-${pkgver}"
 [[ "$CARCH" = "x86_64" ]] && _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
@@ -144,7 +144,7 @@ install_dot_desktop()   {
            "${pkgdir}/usr/share/applications/$1"
 }
 
-install_tls() {
+install_tls()           {
     # Only "new" TLS is needed on modern systems.
     case $5 in
         CLASSIC)
@@ -160,7 +160,7 @@ install_tls() {
     esac
 }
 
-install_doc() {
+install_doc()           {
     # Strip the historical NVIDIA_GLX-1.0 prefix off of the target path and
     # "html" off the source path.
     local src=$(basename $1)
