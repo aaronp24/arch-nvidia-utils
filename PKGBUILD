@@ -108,7 +108,6 @@ install_app_profile()   { install -D -m$2 "$1" "${pkgdir}/usr/share/nvidia/$1"; 
 install_bin()           { install -D -m$2 "$1" "${pkgdir}/usr/bin/$1"; }
 install_glx_module()    { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/extensions/$1"; }
 install_lib()           { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
-install_man()           { install -D -m$2 "$1" "${pkgdir}/usr/share/man/man1/$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
 install_vulkan_icd()    { install -D -m$2 "$1" "${pkgdir}/etc/vulkan/icd.d/$1"; }
 install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
@@ -120,6 +119,17 @@ install_glvnd()         {
             ;;
         GLVND)
             install -D -m$2 "$1" "${pkgdir}/usr/lib/$1";
+            ;;
+    esac
+}
+
+install_man()           {
+    case "$1" in
+        nvidia-installer*)
+            # not needed because "INSTALLER_BINARY" is ignored
+            ;;
+        *)
+            install -D -m$2 "$1" "${pkgdir}/usr/share/man/man1/$1";
             ;;
     esac
 }
