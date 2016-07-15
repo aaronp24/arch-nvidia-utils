@@ -6,7 +6,7 @@
 
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'nvidia-libgl' 'opencl-nvidia')
-pkgver=367.27
+pkgver=367.35
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -14,8 +14,8 @@ license=('custom')
 options=('!strip')
 source=("http://us.download.nvidia.com/XFree86/Linux-x86/${pkgver}/NVIDIA-Linux-x86-${pkgver}.run"
         "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-sha1sums=('26fbf11adad7d3f87df6705ec8cf223d5ab6ba2a'
-          '5b0ce9507f09d68af5c557a062868368cd096d00')
+sha1sums=('8cfa97e0e914832ab46f09c3e41d3fb3024502e1'
+          '694cdc83d4da57c72a4975f345198beb4c8ad720')
 
 [[ "$CARCH" = "i686" ]] && _pkg="NVIDIA-Linux-x86-${pkgver}"
 [[ "$CARCH" = "x86_64" ]] && _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
