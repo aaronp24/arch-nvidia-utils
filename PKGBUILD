@@ -171,9 +171,9 @@ package_opencl-nvidia() {
 
 package_nvidia-libgl() {
     pkgdesc="NVIDIA drivers libraries"
-    conflicts=('libgl')
-    provides=('libgl')
     optdepends=('libvdpau: VDPAU wrapper library')
+    provides=('libgl' 'libegl' 'libgles')
+    conflicts=('libgl' 'libegl' 'libgles')
     cd "${_pkg}"
 
     process_manifest
