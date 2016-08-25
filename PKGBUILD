@@ -184,6 +184,8 @@ package_nvidia-utils() {
     depends=('xorg-server')
     optdepends=('xorg-server-devel: nvidia-xconfig'
                 'opencl-nvidia: OpenCL support')
+    provides=('nvidia-settings')
+    conflicts=('nvidia-settings')
     install="${pkgname}.install"
     cd "${_pkg}"
 
