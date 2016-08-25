@@ -182,8 +182,7 @@ package_nvidia-libgl() {
 package_nvidia-utils() {
     pkgdesc="NVIDIA drivers utilities"
     depends=('xorg-server')
-    optdepends=('gtk3: nvidia-settings'
-                'xorg-server-devel: nvidia-xconfig'
+    optdepends=('xorg-server-devel: nvidia-xconfig'
                 'opencl-nvidia: OpenCL support')
     install="${pkgname}.install"
     cd "${_pkg}"
