@@ -3,10 +3,9 @@
 # Maintainer: Thomas Baechler <thomas@archlinux.org>
 # Contributor: James Rayner <iphitus@gmail.com>
 # Contributor: Aaron Plattner <aplattner@nvidia.com>
-
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'nvidia-libgl' 'opencl-nvidia')
-pkgver=361.16
+pkgver=375.10
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.nvidia.com/"
@@ -14,8 +13,8 @@ license=('custom')
 options=('!strip')
 source=("http://us.download.nvidia.com/XFree86/Linux-x86/${pkgver}/NVIDIA-Linux-x86-${pkgver}.run"
         "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-sha1sums=('786d94caab0830fd16039cc7d26e1e6d6694d766'
-          'b778a97a5175ac6999461708610e55cf445fdf4d')
+sha256sums=('77c06d9c6831d6d1b53276d0741eddac4aab2f2f02b7c1fe14b86aa982aacd69'
+            '7049a8dc8948f5d67f6eb3fac627ac0933270e992b1892401b0134c4bd33ccf6')
 
 [[ "$CARCH" = "i686" ]] && _pkg="NVIDIA-Linux-x86-${pkgver}"
 [[ "$CARCH" = "x86_64" ]] && _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
@@ -35,8 +34,13 @@ process_manifest () {
 
         # nvidia-libgl
         ["APPLICATION_PROFILE"]="nvidia-libgl install_app_profile"
+        ["EGL_CLIENT_LIB"]="nvidia-libgl install_gl_client"
+        ["EGL_CLIENT_SYMLINK"]="nvidia-libgl symlink_gl_client"
+        ["GLVND_EGL_ICD_JSON"]="nvidia-libgl install_egl_json"
         ["GLVND_LIB"]="nvidia-libgl install_lib"
         ["GLVND_SYMLINK"]="nvidia-libgl symlink_lib"
+        ["GLX_CLIENT_LIB"]="nvidia-libgl install_gl_client"
+        ["GLX_CLIENT_SYMLINK"]="nvidia-libgl symlink_gl_client"
         ["GLX_MODULE_SHARED_LIB"]="nvidia-libgl install_glx_module"
         ["GLX_MODULE_SYMLINK"]="nvidia-libgl symlink_glx_module"
         ["NVIDIA_MODPROBE_MANPAGE"]="nvidia-libgl install_man"
@@ -46,6 +50,7 @@ process_manifest () {
         ["TLS_LIB"]="nvidia-libgl install_tls"
         ["VDPAU_LIB"]="nvidia-libgl install_lib"
         ["VDPAU_SYMLINK"]="nvidia-libgl symlink_lib_with_path"
+        ["VULKAN_ICD_JSON"]="nvidia-libgl install_vulkan_json"
         ["XMODULE_SHARED_LIB"]="nvidia-libgl install_x_driver"
         ["XORG_OUTPUTCLASS_CONFIG"]="nvidia-libgl install_x_config"
 
@@ -66,9 +71,9 @@ process_manifest () {
         ["UTILITY_LIB_SYMLINK"]="nvidia-utils symlink_lib"
 
         # Ignored entries
+        ["DKMS_CONF"]="ignored"                 # dkms isn't needed with Arch's version-locked packages
         ["INSTALLER_BINARY"]="ignored"          # provided by pacman :)
         ["KERNEL_MODULE_SRC"]="ignored"         # kernel modules are handled by the nvidia PKGBUILD
-        ["DKMS_CONF"]="ignored"                 # dkms is not used
         ["LIBGL_LA"]="ignored"                  # .la files are not needed
         ["OPENCL_WRAPPER_LIB"]="ignored"        # provided by libcl
         ["OPENCL_WRAPPER_SYMLINK"]="ignored"    # provided by libcl
@@ -106,10 +111,12 @@ process_manifest () {
 
 install_app_profile()   { install -D -m$2 "$1" "${pkgdir}/usr/share/nvidia/$1"; }
 install_bin()           { install -D -m$2 "$1" "${pkgdir}/usr/bin/$1"; }
+install_egl_json()      { install -D -m$2 "$1" "${pkgdir}/usr/share/glvnd/egl_vendor.d/$1"; }
 install_glx_module()    { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/extensions/$1"; }
 install_lib()           { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
 install_man()           { install -D -m$2 "$1" "${pkgdir}/usr/share/man/man1/$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
+install_vulkan_json()   { install -D -m$2 "$1" "${pkgdir}/etc/vulkan/icd.d/$1"; }
 install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
 
 install_x_driver()      {
@@ -155,6 +162,24 @@ install_doc() {
     local src=$(basename $1)
     local target=${4#NVIDIA_GLX-1.0/}
     install -D -m$2 "$1" "${pkgdir}/usr/share/doc/nvidia/${target}/${src}"
+}
+
+install_gl_client() {
+    # Use the GLNVD libraries
+    if [ $5 = "NON_GLVND" ]; then
+        return
+    fi
+
+    install -D -m$2 "$1" "${pkgdir}/usr/lib/$1"
+}
+
+symlink_gl_client() {
+    # Use the GLNVD libraries
+    if [ $6 = "NON_GLVND" ]; then
+        return
+    fi
+
+    symlink_lib "$@"
 }
 
 symlink_glx_module()    { ln -s "$5" "${pkgdir}/usr/lib/xorg/modules/extensions/$1"; }
