@@ -58,7 +58,6 @@ process_manifest () {
         ["CUDA_LIB"]="nvidia-utils install_lib"
         ["CUDA_SYMLINK"]="nvidia-utils symlink_lib_with_path"
         ["DOCUMENTATION"]="nvidia-utils install_doc"
-        ["DOT_DESKTOP"]="nvidia-utils install_dot_desktop"
         ["ENCODEAPI_LIB"]="nvidia-utils install_lib"
         ["ENCODEAPI_LIB_SYMLINK"]="nvidia-utils symlink_lib"
         ["MANPAGE"]="nvidia-utils install_man"
@@ -72,6 +71,7 @@ process_manifest () {
 
         # Ignored entries
         ["DKMS_CONF"]="ignored"                 # dkms isn't needed with Arch's version-locked packages
+        ["DOT_DESKTOP"]="ignored"               # Use the separate Arch nvidia-settings package.
         ["INSTALLER_BINARY"]="ignored"          # provided by pacman :)
         ["KERNEL_MODULE_SRC"]="ignored"         # kernel modules are handled by the nvidia PKGBUILD
         ["LIBGL_LA"]="ignored"                  # .la files are not needed
@@ -110,14 +110,44 @@ process_manifest () {
 }
 
 install_app_profile()   { install -D -m$2 "$1" "${pkgdir}/usr/share/nvidia/$1"; }
-install_bin()           { install -D -m$2 "$1" "${pkgdir}/usr/bin/$1"; }
 install_egl_json()      { install -D -m$2 "$1" "${pkgdir}/usr/share/glvnd/egl_vendor.d/$1"; }
 install_glx_module()    { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/extensions/$1"; }
-install_lib()           { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
-install_man()           { install -D -m$2 "$1" "${pkgdir}/usr/share/man/man1/$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
 install_vulkan_json()   { install -D -m$2 "$1" "${pkgdir}/etc/vulkan/icd.d/$1"; }
 install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
+
+install_bin() {
+    case "$1" in
+        nvidia-settings)
+            # Use the separate Arch nvidia-settings package.
+            ;;
+        *)
+            install -D -m$2 "$1" "${pkgdir}/usr/bin/$1"
+            ;;
+    esac
+}
+
+install_lib() {
+    case "$1" in
+        libnvidia-gtk*)
+            # Use the separate Arch nvidia-settings package.
+            ;;
+        *)
+            install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"
+            ;;
+    esac
+}
+
+install_man() {
+    case "$1" in
+        nvidia-settings.1.gz|nvidia-installer.1.gz)
+            # Skip manpages for utilities that are not packaged.
+            ;;
+        *)
+            install -D -m$2 "$1" "${pkgdir}/usr/share/man/man1/$1"
+            ;;
+    esac
+}
 
 install_x_driver()      {
     case "$1" in
@@ -128,15 +158,6 @@ install_x_driver()      {
             install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/$4$1";
             ;;
     esac
-}
-
-install_dot_desktop()   {
-    install -D -m$2 "$1" "${pkgdir}/usr/share/applications/$1"
-
-    # Set the appropriate paths in the .desktop file
-    sed -i -e s:__UTILS_PATH__:/usr/bin: \
-           -e s:__PIXMAP_PATH__:/usr/share/doc/nvidia: \
-           "${pkgdir}/usr/share/applications/$1"
 }
 
 install_tls() {
@@ -209,8 +230,6 @@ package_nvidia-utils() {
     depends=('xorg-server')
     optdepends=('xorg-server-devel: nvidia-xconfig'
                 'opencl-nvidia: OpenCL support')
-    provides=('nvidia-settings')
-    conflicts=('nvidia-settings')
     install="${pkgname}.install"
     cd "${_pkg}"
 
