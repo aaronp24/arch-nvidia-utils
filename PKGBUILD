@@ -133,9 +133,10 @@ install_x_driver()      {
 install_dot_desktop()   {
     install -D -m$2 "$1" "${pkgdir}/usr/share/applications/$1"
 
-    # Set the appropriate paths in the .desktop file
-    sed -i -e s:__UTILS_PATH__:/usr/bin: \
-           -e s:__PIXMAP_PATH__:/usr/share/doc/nvidia: \
+    # Set the appropriate paths and categories in the .desktop file
+    sed -i -e 's:__UTILS_PATH__:/usr/bin:' \
+           -e 's:__PIXMAP_PATH__:/usr/share/doc/nvidia:' \
+           -e 's:Application;Settings;:Settings;HardwareSettings;:' \
            "${pkgdir}/usr/share/applications/$1"
 }
 
