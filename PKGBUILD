@@ -146,8 +146,7 @@ install_tls() {
             return
             ;;
         NEW)
-            local libname=$(basename $1)
-            install -D -m$2 "$1" "${pkgdir}/usr/lib/${libname}"
+            install -D -m$2 "$1" "${pkgdir}/usr/lib/$1"
             ;;
         *)
             echo "Unrecognized TLS library type $5"
@@ -197,9 +196,9 @@ package_opencl-nvidia() {
 
 package_nvidia-libgl() {
     pkgdesc="NVIDIA drivers libraries"
-    conflicts=('libgl')
-    provides=('libgl')
     optdepends=('libvdpau: VDPAU wrapper library')
+    provides=('libgl' 'libegl' 'libgles')
+    conflicts=('libgl' 'libegl' 'libgles')
     cd "${_pkg}"
 
     process_manifest
@@ -208,9 +207,10 @@ package_nvidia-libgl() {
 package_nvidia-utils() {
     pkgdesc="NVIDIA drivers utilities"
     depends=('xorg-server')
-    optdepends=('gtk3: nvidia-settings'
-                'xorg-server-devel: nvidia-xconfig'
+    optdepends=('xorg-server-devel: nvidia-xconfig'
                 'opencl-nvidia: OpenCL support')
+    provides=('nvidia-settings')
+    conflicts=('nvidia-settings')
     install="${pkgname}.install"
     cd "${_pkg}"
 
