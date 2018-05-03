@@ -5,19 +5,16 @@
 # Contributor: Aaron Plattner <aplattner@nvidia.com>
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'nvidia-libgl' 'opencl-nvidia')
-pkgver=375.10
+pkgver=396.24
 pkgrel=1
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
-source=("http://us.download.nvidia.com/XFree86/Linux-x86/${pkgver}/NVIDIA-Linux-x86-${pkgver}.run"
-        "http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-sha256sums=('77c06d9c6831d6d1b53276d0741eddac4aab2f2f02b7c1fe14b86aa982aacd69'
-            '7049a8dc8948f5d67f6eb3fac627ac0933270e992b1892401b0134c4bd33ccf6')
+source=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
+sha256sums=('41b80d2a4519ac78ac17c02fec976256d2ba5c9618640d2a9be9cb70685b2a9c')
 
-[[ "$CARCH" = "i686" ]] && _pkg="NVIDIA-Linux-x86-${pkgver}"
-[[ "$CARCH" = "x86_64" ]] && _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
+_pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
 
 prepare() {
     sh "${_pkg}.run" --extract-only
@@ -33,41 +30,41 @@ process_manifest () {
         ["OPENCL_LIB_SYMLINK"]="opencl-nvidia symlink_lib_with_path"
 
         # nvidia-libgl
-        ["APPLICATION_PROFILE"]="nvidia-libgl install_app_profile"
         ["EGL_CLIENT_LIB"]="nvidia-libgl install_gl_client"
         ["EGL_CLIENT_SYMLINK"]="nvidia-libgl symlink_gl_client"
-        ["GLVND_EGL_ICD_JSON"]="nvidia-libgl install_egl_json"
         ["GLVND_LIB"]="nvidia-libgl install_lib"
         ["GLVND_SYMLINK"]="nvidia-libgl symlink_lib"
         ["GLX_CLIENT_LIB"]="nvidia-libgl install_gl_client"
         ["GLX_CLIENT_SYMLINK"]="nvidia-libgl symlink_gl_client"
-        ["GLX_MODULE_SHARED_LIB"]="nvidia-libgl install_glx_module"
-        ["GLX_MODULE_SYMLINK"]="nvidia-libgl symlink_glx_module"
-        ["NVIDIA_MODPROBE_MANPAGE"]="nvidia-libgl install_man"
-        ["NVIDIA_MODPROBE"]="nvidia-libgl install_bin"
-        ["OPENGL_LIB"]="nvidia-libgl install_lib"
-        ["OPENGL_SYMLINK"]="nvidia-libgl symlink_lib"
-        ["TLS_LIB"]="nvidia-libgl install_tls"
-        ["VDPAU_LIB"]="nvidia-libgl install_lib"
-        ["VDPAU_SYMLINK"]="nvidia-libgl symlink_lib_with_path"
-        ["VULKAN_ICD_JSON"]="nvidia-libgl install_vulkan_json"
-        ["XMODULE_SHARED_LIB"]="nvidia-libgl install_x_driver"
-        ["XORG_OUTPUTCLASS_CONFIG"]="nvidia-libgl install_x_config"
 
         # nvidia-utils
-        ["CUDA_LIB"]="nvidia-utils install_lib"
+        ["APPLICATION_PROFILE"]="nvidia-utils install_app_profile"
+        ["CUDA_LIB"]="nvidia-utils install_lib_with_path"
         ["CUDA_SYMLINK"]="nvidia-utils symlink_lib_with_path"
         ["DOCUMENTATION"]="nvidia-utils install_doc"
         ["ENCODEAPI_LIB"]="nvidia-utils install_lib"
         ["ENCODEAPI_LIB_SYMLINK"]="nvidia-utils symlink_lib"
+        ["GLVND_EGL_ICD_JSON"]="nvidia-utils install_egl_json"
+        ["GLX_MODULE_SHARED_LIB"]="nvidia-utils install_glx_module"
+        ["GLX_MODULE_SYMLINK"]="nvidia-utils symlink_glx_module"
         ["MANPAGE"]="nvidia-utils install_man"
         ["NVCUVID_LIB"]="nvidia-utils install_lib"
         ["NVCUVID_LIB_SYMLINK"]="nvidia-utils symlink_lib"
+        ["NVIDIA_MODPROBE_MANPAGE"]="nvidia-utils install_man"
+        ["NVIDIA_MODPROBE"]="nvidia-utils install_bin"
         ["NVIFR_LIB"]="nvidia-utils install_lib"
         ["NVIFR_LIB_SYMLINK"]="nvidia-utils symlink_lib"
+        ["OPENGL_LIB"]="nvidia-utils install_lib"
+        ["OPENGL_SYMLINK"]="nvidia-utils symlink_lib"
+        ["TLS_LIB"]="nvidia-utils install_tls"
         ["UTILITY_BINARY"]="nvidia-utils install_bin"
         ["UTILITY_LIB"]="nvidia-utils install_lib"
         ["UTILITY_LIB_SYMLINK"]="nvidia-utils symlink_lib"
+        ["VDPAU_LIB"]="nvidia-utils install_lib_with_path"
+        ["VDPAU_SYMLINK"]="nvidia-utils symlink_lib_with_path"
+        ["VULKAN_ICD_JSON"]="nvidia-utils install_vulkan_json"
+        ["XMODULE_SHARED_LIB"]="nvidia-utils install_x_driver"
+        ["XORG_OUTPUTCLASS_CONFIG"]="nvidia-utils install_x_config"
 
         # Ignored entries
         ["DKMS_CONF"]="ignored"                 # dkms isn't needed with Arch's version-locked packages
@@ -84,6 +81,7 @@ process_manifest () {
         ["VDPAU_WRAPPER_SYMLINK"]="ignored"     # provided by libvdpau
         ["XMODULE_NEWSYM"]="ignored"            # not needed for modern X servers
         ["XMODULE_SYMLINK"]="ignored"           # not needed for modern X servers
+        ["EGL_EXTERNAL_PLATFORM_JSON"]="ignored" # TODO: Install this somewhere
     )
 
     tail -n +9 .manifest | {
@@ -111,10 +109,9 @@ process_manifest () {
 
 install_app_profile()   { install -D -m$2 "$1" "${pkgdir}/usr/share/nvidia/$1"; }
 install_egl_json()      { install -D -m$2 "$1" "${pkgdir}/usr/share/glvnd/egl_vendor.d/$1"; }
-install_glx_module()    { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/extensions/$1"; }
+install_glx_module()    { install -D -m$2 "$1" "${pkgdir}/usr/lib/nvidia/xorg/$1"; }
+install_lib_with_path() { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
-install_vulkan_json()   { install -D -m$2 "$1" "${pkgdir}/etc/vulkan/icd.d/$1"; }
-install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
 
 install_bin() {
     case "$1" in
@@ -133,7 +130,7 @@ install_lib() {
             # Use the separate Arch nvidia-settings package.
             ;;
         *)
-            install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"
+            install -D -m$2 "$1" "${pkgdir}/usr/lib/$1"
             ;;
     esac
 }
@@ -147,6 +144,20 @@ install_man() {
             install -D -m$2 "$1" "${pkgdir}/usr/share/man/man1/$1"
             ;;
     esac
+}
+
+install_vulkan_json()   {
+    mkdir -p "${pkgdir}/etc/vulkan/icd.d/"
+    sed -e s/__NV_VK_ICD__/libGLX_nvidia.so.${pkgver}/ "$1" > \
+        "${pkgdir}/etc/vulkan/icd.d/${1/.template}"
+}
+
+install_x_config()      {
+    install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"
+
+    # Add a rule to pick up libglx from /usr/lib/nvidia/xorg
+    sed -i -e '/ Driver/a\ \ \ \ ModulePath     "/usr/lib/nvidia/xorg"' \
+        "${pkgdir}/usr/share/X11/xorg.conf.d/$1"
 }
 
 install_x_driver()      {
@@ -167,7 +178,8 @@ install_tls() {
             return
             ;;
         NEW)
-            install -D -m$2 "$1" "${pkgdir}/usr/lib/$1"
+            local libname=$(basename $1)
+            install -D -m$2 "$1" "${pkgdir}/usr/lib/${libname}"
             ;;
         *)
             echo "Unrecognized TLS library type $5"
@@ -202,14 +214,19 @@ symlink_gl_client() {
     symlink_lib "$@"
 }
 
-symlink_glx_module()    { ln -s "$5" "${pkgdir}/usr/lib/xorg/modules/extensions/$1"; }
-symlink_lib()           { ln -s "$5" "${pkgdir}/usr/lib/$1"; }
+symlink_glx_module()    { ln -s "$5" "${pkgdir}/usr/lib/nvidia/xorg/$1"; }
+symlink_lib()           {
+    if [ "$1" != libGLX_indirect.so.0 ]; then
+        ln -s "$5" "${pkgdir}/usr/lib/$1"
+    fi
+}
 symlink_lib_with_path() { ln -s "$6" "${pkgdir}/usr/lib/$5$1"; }
 
 package_opencl-nvidia() {
     pkgdesc="OpenCL implemention for NVIDIA"
     depends=('libcl' 'zlib')
     optdepends=('opencl-headers: headers necessary for OpenCL development')
+    provides=('opencl-driver')
     cd "${_pkg}"
 
     process_manifest
