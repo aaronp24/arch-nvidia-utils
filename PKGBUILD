@@ -4,9 +4,9 @@
 # Contributor: James Rayner <iphitus@gmail.com>
 # Contributor: Aaron Plattner <aplattner@nvidia.com>
 pkgbase=nvidia-utils
-pkgname=('nvidia-utils' 'nvidia-libgl' 'opencl-nvidia')
+pkgname=('nvidia-utils' 'opencl-nvidia')
 pkgver=396.24
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
@@ -28,14 +28,6 @@ process_manifest () {
         ["CUDA_ICD"]="opencl-nvidia install_opencl_vendor"
         ["OPENCL_LIB"]="opencl-nvidia install_lib"
         ["OPENCL_LIB_SYMLINK"]="opencl-nvidia symlink_lib_with_path"
-
-        # nvidia-libgl
-        ["EGL_CLIENT_LIB"]="nvidia-libgl install_gl_client"
-        ["EGL_CLIENT_SYMLINK"]="nvidia-libgl symlink_gl_client"
-        ["GLVND_LIB"]="nvidia-libgl install_lib"
-        ["GLVND_SYMLINK"]="nvidia-libgl symlink_lib"
-        ["GLX_CLIENT_LIB"]="nvidia-libgl install_gl_client"
-        ["GLX_CLIENT_SYMLINK"]="nvidia-libgl symlink_gl_client"
 
         # nvidia-utils
         ["APPLICATION_PROFILE"]="nvidia-utils install_app_profile"
@@ -69,6 +61,12 @@ process_manifest () {
         # Ignored entries
         ["DKMS_CONF"]="ignored"                 # dkms isn't needed with Arch's version-locked packages
         ["DOT_DESKTOP"]="ignored"               # Use the separate Arch nvidia-settings package.
+        ["EGL_CLIENT_LIB"]="ignored"            # provided by libglvnd
+        ["EGL_CLIENT_SYMLINK"]="ignored"        # provided by libglvnd
+        ["GLVND_LIB"]="ignored"                 # provided by libglvnd
+        ["GLVND_SYMLINK"]="ignored"             # provided by libglvnd
+        ["GLX_CLIENT_LIB"]="ignored"            # provided by libglvnd
+        ["GLX_CLIENT_SYMLINK"]="ignored"        # provided by libglvnd
         ["INSTALLER_BINARY"]="ignored"          # provided by pacman :)
         ["KERNEL_MODULE_SRC"]="ignored"         # kernel modules are handled by the nvidia PKGBUILD
         ["LIBGL_LA"]="ignored"                  # .la files are not needed
@@ -196,24 +194,6 @@ install_doc() {
     install -D -m$2 "$1" "${pkgdir}/usr/share/doc/nvidia/${target}/${src}"
 }
 
-install_gl_client() {
-    # Use the GLNVD libraries
-    if [ $5 = "NON_GLVND" ]; then
-        return
-    fi
-
-    install -D -m$2 "$1" "${pkgdir}/usr/lib/$1"
-}
-
-symlink_gl_client() {
-    # Use the GLNVD libraries
-    if [ $6 = "NON_GLVND" ]; then
-        return
-    fi
-
-    symlink_lib "$@"
-}
-
 symlink_glx_module()    { ln -s "$5" "${pkgdir}/usr/lib/nvidia/xorg/$1"; }
 symlink_lib()           {
     if [ "$1" != libGLX_indirect.so.0 ]; then
@@ -227,16 +207,6 @@ package_opencl-nvidia() {
     depends=('libcl' 'zlib')
     optdepends=('opencl-headers: headers necessary for OpenCL development')
     provides=('opencl-driver')
-    cd "${_pkg}"
-
-    process_manifest
-}
-
-package_nvidia-libgl() {
-    pkgdesc="NVIDIA drivers libraries"
-    optdepends=('libvdpau: VDPAU wrapper library')
-    provides=('libgl' 'libegl' 'libgles')
-    conflicts=('libgl' 'libegl' 'libgles')
     cd "${_pkg}"
 
     process_manifest
