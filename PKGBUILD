@@ -5,14 +5,14 @@
 # Contributor: Aaron Plattner <aplattner@nvidia.com>
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia')
-pkgver=396.24
-pkgrel=2
+pkgver=415.18
+pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
 source=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-sha256sums=('41b80d2a4519ac78ac17c02fec976256d2ba5c9618640d2a9be9cb70685b2a9c')
+sha256sums=('c90af3b6cc1f524799c75da99734f37dceeed2267afc3278a293367d21edc795')
 
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
 
@@ -48,7 +48,7 @@ process_manifest () {
         ["NVIFR_LIB_SYMLINK"]="nvidia-utils symlink_lib"
         ["OPENGL_LIB"]="nvidia-utils install_lib"
         ["OPENGL_SYMLINK"]="nvidia-utils symlink_lib"
-        ["TLS_LIB"]="nvidia-utils install_tls"
+        ["TLS_LIB"]="nvidia-utils install_lib"
         ["UTILITY_BINARY"]="nvidia-utils install_bin"
         ["UTILITY_LIB"]="nvidia-utils install_lib"
         ["UTILITY_LIB_SYMLINK"]="nvidia-utils symlink_lib"
@@ -165,23 +165,6 @@ install_x_driver()      {
             ;;
         *)
             install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/$4$1";
-            ;;
-    esac
-}
-
-install_tls() {
-    # Only "new" TLS is needed on modern systems.
-    case $5 in
-        CLASSIC)
-            return
-            ;;
-        NEW)
-            local libname=$(basename $1)
-            install -D -m$2 "$1" "${pkgdir}/usr/lib/${libname}"
-            ;;
-        *)
-            echo "Unrecognized TLS library type $5"
-            exit 1
             ;;
     esac
 }
