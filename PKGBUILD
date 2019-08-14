@@ -5,14 +5,14 @@
 # Contributor: Aaron Plattner <aplattner@nvidia.com>
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia')
-pkgver=415.18
+pkgver=435.17
 pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
-source=("http://us.download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-sha256sums=('c90af3b6cc1f524799c75da99734f37dceeed2267afc3278a293367d21edc795')
+source=("http://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
+sha256sums=('1d5e23663c8730f6c8035debe728a18da112e3d0a12a859f76e0b16132c33162')
 
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
 
@@ -107,9 +107,12 @@ process_manifest () {
 
 install_app_profile()   { install -D -m$2 "$1" "${pkgdir}/usr/share/nvidia/$1"; }
 install_egl_json()      { install -D -m$2 "$1" "${pkgdir}/usr/share/glvnd/egl_vendor.d/$1"; }
-install_glx_module()    { install -D -m$2 "$1" "${pkgdir}/usr/lib/nvidia/xorg/$1"; }
+install_glx_module()    { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/extensions/$1"; }
 install_lib_with_path() { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
+install_vulkan_json()   { install -D -m$2 "$1" "${pkgdir}/etc/vulkan/$4$1"; }
+install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
+
 
 install_bin() {
     case "$1" in
@@ -144,20 +147,6 @@ install_man() {
     esac
 }
 
-install_vulkan_json()   {
-    mkdir -p "${pkgdir}/etc/vulkan/icd.d/"
-    sed -e s/__NV_VK_ICD__/libGLX_nvidia.so.${pkgver}/ "$1" > \
-        "${pkgdir}/etc/vulkan/icd.d/${1/.template}"
-}
-
-install_x_config()      {
-    install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"
-
-    # Add a rule to pick up libglx from /usr/lib/nvidia/xorg
-    sed -i -e '/ Driver/a\ \ \ \ ModulePath     "/usr/lib/nvidia/xorg"' \
-        "${pkgdir}/usr/share/X11/xorg.conf.d/$1"
-}
-
 install_x_driver()      {
     case "$1" in
         libnvidia-wfb*)
@@ -177,7 +166,7 @@ install_doc() {
     install -D -m$2 "$1" "${pkgdir}/usr/share/doc/nvidia/${target}/${src}"
 }
 
-symlink_glx_module()    { ln -s "$5" "${pkgdir}/usr/lib/nvidia/xorg/$1"; }
+symlink_glx_module()    { ln -s "$5" "${pkgdir}/usr/lib/xorg/modules/extensions/$1"; }
 symlink_lib()           {
     if [ "$1" != libGLX_indirect.so.0 ]; then
         ln -s "$5" "${pkgdir}/usr/lib/$1"
@@ -187,7 +176,7 @@ symlink_lib_with_path() { ln -s "$6" "${pkgdir}/usr/lib/$5$1"; }
 
 package_opencl-nvidia() {
     pkgdesc="OpenCL implemention for NVIDIA"
-    depends=('libcl' 'zlib')
+    depends=('zlib')
     optdepends=('opencl-headers: headers necessary for OpenCL development')
     provides=('opencl-driver')
     cd "${_pkg}"
