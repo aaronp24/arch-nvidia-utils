@@ -1,18 +1,20 @@
-# $Id: PKGBUILD 239541 2015-05-18 23:34:43Z svenstaro $
 # Maintainer: Sven-Hendrik Haase <sh@lutzhaase.com>
 # Maintainer: Thomas Baechler <thomas@archlinux.org>
 # Contributor: James Rayner <iphitus@gmail.com>
 # Contributor: Aaron Plattner <aplattner@nvidia.com>
+
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia')
-pkgver=435.17
+pkgver=465.19.01
 pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
-source=("http://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run")
-sha256sums=('1d5e23663c8730f6c8035debe728a18da112e3d0a12a859f76e0b16132c33162')
+source=("http://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run"
+        'nvidia-utils.sysusers')
+sha256sums=('1bfc0e95d5f14bcb62bc56c074524e2adfe968860f481c38f95a0587774940c2'
+            'd8d1caa5d72c71c6430c2a0d9ce1a674787e9272ccce28b9d5898ca24e60a167')
 
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
 
@@ -48,6 +50,9 @@ process_manifest () {
         ["NVIFR_LIB_SYMLINK"]="nvidia-utils symlink_lib"
         ["OPENGL_LIB"]="nvidia-utils install_lib"
         ["OPENGL_SYMLINK"]="nvidia-utils symlink_lib"
+        ["SYSTEMD_SLEEP_SCRIPT"]="nvidia-utils install_lib"
+        ["SYSTEMD_UNIT"]="nvidia-utils install_lib"
+        ["SYSTEMD_UNIT_SYMLINK"]="nvidia-utils symlink_systemd_unit"
         ["TLS_LIB"]="nvidia-utils install_lib"
         ["UTILITY_BINARY"]="nvidia-utils install_bin"
         ["UTILITY_LIB"]="nvidia-utils install_lib"
@@ -63,22 +68,20 @@ process_manifest () {
         ["DOT_DESKTOP"]="ignored"               # Use the separate Arch nvidia-settings package.
         ["EGL_CLIENT_LIB"]="ignored"            # provided by libglvnd
         ["EGL_CLIENT_SYMLINK"]="ignored"        # provided by libglvnd
+        ["FIRMWARE"]="ignored"                  # provided by nvidia
         ["GLVND_LIB"]="ignored"                 # provided by libglvnd
         ["GLVND_SYMLINK"]="ignored"             # provided by libglvnd
         ["GLX_CLIENT_LIB"]="ignored"            # provided by libglvnd
         ["GLX_CLIENT_SYMLINK"]="ignored"        # provided by libglvnd
         ["INSTALLER_BINARY"]="ignored"          # provided by pacman :)
+        ["INTERNAL_UTILITY_BINARY"]="ignored"   # glvnd install checker, not needed
+        ["INTERNAL_UTILITY_DATA"]="ignored"     # glvnd install checker, not needed
+        ["INTERNAL_UTILITY_LIB"]="ignoed"       # glvnd install checker, not needed
         ["KERNEL_MODULE_SRC"]="ignored"         # kernel modules are handled by the nvidia PKGBUILD
         ["LIBGL_LA"]="ignored"                  # .la files are not needed
         ["OPENCL_WRAPPER_LIB"]="ignored"        # provided by libcl
         ["OPENCL_WRAPPER_SYMLINK"]="ignored"    # provided by libcl
-        ["OPENGL_HEADER"]="ignored"             # provided by mesa
         ["UTILITY_BIN_SYMLINK"]="ignored"       # provided by pacman
-        ["UVM_MODULE_SRC"]="ignored"            # kernel modules are handled by the nvidia PKGBUILD
-        ["VDPAU_WRAPPER_LIB"]="ignored"         # provided by libvdpau
-        ["VDPAU_WRAPPER_SYMLINK"]="ignored"     # provided by libvdpau
-        ["XMODULE_NEWSYM"]="ignored"            # not needed for modern X servers
-        ["XMODULE_SYMLINK"]="ignored"           # not needed for modern X servers
         ["EGL_EXTERNAL_PLATFORM_JSON"]="ignored" # TODO: Install this somewhere
     )
 
@@ -112,6 +115,7 @@ install_lib_with_path() { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
 install_vulkan_json()   { install -D -m$2 "$1" "${pkgdir}/etc/vulkan/$4$1"; }
 install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
+install_x_driver()      { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/$4$1"; }
 
 
 install_bin() {
@@ -120,7 +124,7 @@ install_bin() {
             # Use the separate Arch nvidia-settings package.
             ;;
         *)
-            install -D -m$2 "$1" "${pkgdir}/usr/bin/$1"
+            install -D -m$2 "$1" "${pkgdir}/usr/bin/$(basename $1)"
             ;;
     esac
 }
@@ -129,6 +133,9 @@ install_lib() {
     case "$1" in
         libnvidia-gtk*)
             # Use the separate Arch nvidia-settings package.
+            ;;
+        libnvidia-egl-wayland*)
+            # Use the separate Arch egl-wayland package.
             ;;
         *)
             install -D -m$2 "$1" "${pkgdir}/usr/lib/$1"
@@ -147,23 +154,14 @@ install_man() {
     esac
 }
 
-install_x_driver()      {
-    case "$1" in
-        libnvidia-wfb*)
-            # not needed for modern X servers
-            ;;
-        *)
-            install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/$4$1";
-            ;;
-    esac
-}
-
 install_doc() {
     # Strip the historical NVIDIA_GLX-1.0 prefix off of the target path and
     # "html" off the source path.
     local src=$(basename $1)
     local target=${4#NVIDIA_GLX-1.0/}
-    install -D -m$2 "$1" "${pkgdir}/usr/share/doc/nvidia/${target}/${src}"
+    local perms=$2
+
+    install -D -m${perms} "$1" "${pkgdir}/usr/share/doc/nvidia/${target}/${src}"
 }
 
 symlink_glx_module()    { ln -s "$5" "${pkgdir}/usr/lib/xorg/modules/extensions/$1"; }
@@ -173,9 +171,14 @@ symlink_lib()           {
     fi
 }
 symlink_lib_with_path() { ln -s "$6" "${pkgdir}/usr/lib/$5$1"; }
+symlink_systemd_unit()  {
+    local linkdir="${pkgdir}/etc/systemd/system/$4/"
+    mkdir -p "${linkdir}"
+    ln -s "/usr/lib/systemd/system/$1" "${linkdir}/$1"
+}
 
 package_opencl-nvidia() {
-    pkgdesc="OpenCL implemention for NVIDIA"
+    pkgdesc="OpenCL implementation for NVIDIA"
     depends=('zlib')
     optdepends=('opencl-headers: headers necessary for OpenCL development')
     provides=('opencl-driver')
@@ -186,9 +189,13 @@ package_opencl-nvidia() {
 
 package_nvidia-utils() {
     pkgdesc="NVIDIA drivers utilities"
-    depends=('xorg-server')
-    optdepends=('xorg-server-devel: nvidia-xconfig'
+    depends=('xorg-server' 'libglvnd' 'egl-wayland')
+    optdepends=('nvidia-settings: configuration tool'
+                'xorg-server-devel: nvidia-xconfig'
                 'opencl-nvidia: OpenCL support')
+    conflicts=('nvidia-libgl')
+    provides=('vulkan-driver' 'opengl-driver' 'nvidia-libgl')
+    replaces=('nvidia-libgl')
     install="${pkgname}.install"
     cd "${_pkg}"
 
@@ -196,4 +203,9 @@ package_nvidia-utils() {
 
     install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/nvidia/LICENSE"
     ln -s nvidia "${pkgdir}/usr/share/doc/nvidia-utils"
+
+    # install extra nvidia-persistenced stuff
+    install -D -m644 "nvidia-persistenced-init/systemd/nvidia-persistenced.service.template" "${pkgdir}/usr/lib/systemd/system/nvidia-persistenced.service"
+    sed -i 's/__USER__/nvidia-persistenced/' "${pkgdir}/usr/lib/systemd/system/nvidia-persistenced.service"
+    install -Dm644 "${srcdir}/nvidia-utils.sysusers" "${pkgdir}/usr/lib/sysusers.d/$pkgname.conf"
 }
