@@ -1,11 +1,11 @@
-# Maintainer: Sven-Hendrik Haase <sh@lutzhaase.com>
+# Maintainer: Sven-Hendrik Haase <svenstaro@gmail.com>
 # Maintainer: Thomas Baechler <thomas@archlinux.org>
 # Contributor: James Rayner <iphitus@gmail.com>
 # Contributor: Aaron Plattner <aplattner@nvidia.com>
 
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia')
-pkgver=465.19.01
+pkgver=470.42.01
 pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
@@ -13,7 +13,7 @@ license=('custom')
 options=('!strip')
 source=("http://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}-no-compat32.run"
         'nvidia-utils.sysusers')
-sha256sums=('1bfc0e95d5f14bcb62bc56c074524e2adfe968860f481c38f95a0587774940c2'
+sha256sums=('7e53a3557908fb0c8e86e22200f4ee670dcec8f6ee6c4a171362d86d6c8bce20'
             'd8d1caa5d72c71c6430c2a0d9ce1a674787e9272ccce28b9d5898ca24e60a167')
 
 _pkg="NVIDIA-Linux-x86_64-${pkgver}-no-compat32"
@@ -60,6 +60,7 @@ process_manifest () {
         ["VDPAU_LIB"]="nvidia-utils install_lib_with_path"
         ["VDPAU_SYMLINK"]="nvidia-utils symlink_lib_with_path"
         ["VULKAN_ICD_JSON"]="nvidia-utils install_vulkan_json"
+        ["WINE_LIB"]="nvidia-utils install_wine_lib"
         ["XMODULE_SHARED_LIB"]="nvidia-utils install_x_driver"
         ["XORG_OUTPUTCLASS_CONFIG"]="nvidia-utils install_x_config"
 
@@ -114,6 +115,7 @@ install_glx_module()    { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/e
 install_lib_with_path() { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
 install_vulkan_json()   { install -D -m$2 "$1" "${pkgdir}/etc/vulkan/$4$1"; }
+install_wine_lib()      { install -D -m$2 "$1" "${pkgdir}/usr/lib/nvidia/wine/$1"; }
 install_x_config()      { install -D -m$2 "$1" "${pkgdir}/usr/share/X11/xorg.conf.d/$1"; }
 install_x_driver()      { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/$4$1"; }
 
