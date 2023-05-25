@@ -9,16 +9,16 @@ pkgname=('nvidia-utils'
          'nvidia-dkms'
          'lib32-nvidia-utils'
          'lib32-opencl-nvidia')
-pkgver=525.53
+pkgver=530.41.03
 pkgrel=1
 arch=('x86_64')
 url="http://www.nvidia.com/"
 license=('custom')
 options=('!strip')
-source=("http://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}.run"
+source=("https://download.nvidia.com/XFree86/Linux-x86_64/${pkgver}/NVIDIA-Linux-x86_64-${pkgver}.run"
         'nvidia-utils.sysusers'
         'nvidia.rules')
-sha256sums=('74bb0971f04f1dddd3c4641c891706fb96e8de52e22f6079e50de76d3a51687f'
+sha256sums=('ae27a16a968c85503f5d161dda343c1602612b025f4aee15f92e2ea0acb784b1'
             'd8d1caa5d72c71c6430c2a0d9ce1a674787e9272ccce28b9d5898ca24e60a167'
             '4fbfd461f939f18786e79f8dba5fdb48be9f00f2ff4b1bb2f184dbce42dd6fc3')
 
@@ -63,6 +63,7 @@ process_manifest () {
         ["DOCUMENTATION"]="nvidia-utils install_doc"
         ["ENCODEAPI_LIB"]="nvidia-utils install_lib"
         ["ENCODEAPI_LIB_SYMLINK"]="nvidia-utils symlink_lib"
+        ["EXPLICIT_PATH"]="nvidia-utils install_explicit_path"
         ["GBM_BACKEND_LIB_SYMLINK"]="nvidia-utils symlink_gbm"
         ["GLVND_EGL_ICD_JSON"]="nvidia-utils install_egl_json"
         ["GLX_MODULE_SHARED_LIB"]="nvidia-utils install_glx_module"
@@ -74,6 +75,7 @@ process_manifest () {
         ["NVIDIA_MODPROBE"]="nvidia-utils install_bin"
         ["NVIFR_LIB"]="nvidia-utils install_lib"
         ["NVIFR_LIB_SYMLINK"]="nvidia-utils symlink_lib"
+        ["OPENGL_DATA"]="nvidia-utils install_app_profile"
         ["OPENGL_LIB"]="nvidia-utils install_lib"
         ["OPENGL_SYMLINK"]="nvidia-utils symlink_lib"
         ["SYSTEMD_SLEEP_SCRIPT"]="nvidia-utils install_lib"
@@ -120,6 +122,7 @@ process_manifest () {
         ["GLVND_SYMLINK"]="ignored"             # provided by libglvnd
         ["GLX_CLIENT_LIB"]="ignored"            # provided by libglvnd
         ["GLX_CLIENT_SYMLINK"]="ignored"        # provided by libglvnd
+        ["ICON"]="ignored"                      # provided by nvidia-settings
         ["INSTALLER_BINARY"]="ignored"          # provided by pacman :)
         ["INTERNAL_UTILITY_BINARY"]="ignored"   # glvnd install checker, not needed
         ["INTERNAL_UTILITY_DATA"]="ignored"     # glvnd install checker, not needed
@@ -168,6 +171,7 @@ process_manifest () {
 install_app_profile()   { install -D -m$2 "$1" "${pkgdir}/usr/share/nvidia/$1"; }
 install_egl_json()      { install -D -m$2 "$1" "${pkgdir}/usr/share/glvnd/egl_vendor.d/$1"; }
 install_egl_platform()  { install -D -m$2 "$1" "${pkgdir}/usr/share/egl/egl_external_platform.d/$1"; }
+install_explicit_path() { install -D -m$2 "$1" "${pkgdir}$4/$1"; }
 install_glx_module()    { install -D -m$2 "$1" "${pkgdir}/usr/lib/xorg/modules/extensions/$1"; }
 install_lib_with_path() { install -D -m$2 "$1" "${pkgdir}/usr/lib/$5$1"; }
 install_opencl_vendor() { install -D -m$2 "$1" "${pkgdir}/etc/OpenCL/vendors/$1"; }
